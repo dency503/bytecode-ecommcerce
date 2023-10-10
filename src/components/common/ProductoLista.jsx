@@ -3,6 +3,7 @@ import ProductoCard from "./ProductoCard";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import api from "../../utils/apiConfig";
+import axios from "axios";
 
 /*const productos = [
   {
@@ -44,7 +45,7 @@ const ProductoLista = () => {
   const [productos, setProductos] = useState([]);
   useEffect(() => {
     // Hacer una solicitud GET a la API para obtener la lista de productos
-    api.get("/productos")
+    axios.get("http://localhost:8080/api/productos")
       .then((response) => {
         // Establecer los productos en el estado usando los datos de la respuesta
         setProductos(response.data);

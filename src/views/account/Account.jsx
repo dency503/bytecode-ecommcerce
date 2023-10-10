@@ -131,32 +131,7 @@ const UserProfile = () => {
               <hr />
               
             </div>
-            <div className="col-md-4">
-              <h3>
-                <strong>Carrito de Compras</strong>
-              </h3>
-              {carrito.map((producto) => (
-                <div key={producto.id} className="cart-item text-center">
-                  <img src={producto.image} alt={`Producto ${producto.id}`} />
-                  <h3>{producto.nombre}</h3>
-                  <p>Precio: ${producto.precio.toFixed(2)}</p>
-                  <p>Cantidad: {producto.cantidad}</p>
-                  <p>
-                    Subtotal: $
-                    {(producto.precio * producto.cantidad).toFixed(2)}
-                  </p>
-                </div>
-              ))}
-              <div className="cart-total">
-                <h3>Total: ${total.toFixed(2)}</h3>
-              </div>
-              <a
-                href="/electro-master/store.html"
-                className="btn btn-primary btn-block"
-              >
-                Seguir buscando
-              </a>
-            </div>
+           
           </div>
         </div>
       </div>

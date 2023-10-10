@@ -30,6 +30,24 @@ const Header = () => {
   ];
 
   const [name, setName] = useState("");
+  const [cart, setCart] = useState([]);
+
+  const deleteFromCart = async (id) => {
+    try {
+      const response = await api.delete(`/carrito/item/${id}`);
+      if (response.status === 200) {
+        // La eliminación fue exitosa, realizar acciones adicionales si es necesario
+        console.log('Elemento eliminado del carrito con éxito.');
+        // Realizar otras acciones después de la eliminación si es necesario
+      } else {
+        // La eliminación no fue exitosa, manejar el error si es necesario
+        console.error('Error al eliminar el elemento del carrito.');
+      }
+    } catch (error) {
+      // Error de red u otro error, manejar el error si es necesario
+      console.error('Error de red al intentar eliminar el elemento del carrito.', error);
+    }
+  };
   useEffect(() => {
     // Hacer una solicitud GET a la API para obtener el nombre
     api.get("/v1/auth/username")
@@ -40,10 +58,19 @@ const Header = () => {
       .catch((error) => {
         console.error("Error al obtener productos:", error);
       });
+    api.get("/carrito")
+      .then((response) => {
+        // Establecer el nombre en el estado usando los datos de la respuesta
+        setCart(response.data);
+      })
+      .catch((error) => {
+        console.error("Error al obtener carrito:", error);
+      });
+
   }, [localStorage.getItem('token')]);
 
   return (
-    <header>
+    <header>{console.log(cart)}
       <div id="top-header">
         <Container>
           <ul className="header-links pull-left">
@@ -65,12 +92,12 @@ const Header = () => {
               </a>
             </li>
             <li>
-               {name ? <a href="/cuenta">
-                <i className="fa fa-user-o"></i> {name }
+              {name ? <a href="/cuenta">
+                <i className="fa fa-user-o"></i> {name}
               </a> : <a href="/signin">
                 <i className="fa fa-user-o"></i> Iniciar Sesion
               </a>}
-              
+
             </li>
           </ul>
         </Container>
@@ -80,7 +107,7 @@ const Header = () => {
           <div className="row">
             <div className="col-md-3">
               <div className="header-logo">
-                <a href="#" className="logo">
+                <a href="/" className="logo">
                   <img src="/logo.png" alt="" />
                 </a>
               </div>
@@ -120,27 +147,27 @@ const Header = () => {
                   >
                     <i className="fa fa-shopping-cart"></i>
                     <span>Carrito</span>
-                    <div className="qty">{cartItems.length}</div>
+                    <div className="qty">{cart.items && cart.items.length}</div>
                   </a>
                   <div className="dropdown-menu" aria-labelledby="cartDropdown">
                     <div className="cart-list">
-                      {cartItems.map((item) => (
-                        <div key={item.id} className="product-widget">
+                      {cart.items && cart.items.map(item => (
+                        <div key={item.itemId} className="product-widget">
                           <div className="product-img">
-                            <img src={item.image} alt={item.name} />
+                            <img src={item.producto.imagenURl} alt={item.producto.nombreProducto} />
                           </div>
                           <div className="product-body">
-                            <h3 className="product-name">{item.name}</h3>
+                            <h3 className="product-name">{item.producto.nombreProducto}</h3>
                             <h4 className="product-price">
-                              <span className="qty">{item.quantity}x</span>$
-                              {item.price.toFixed(2)}
+                              <span className="qty">{item.cantidad}x</span>${item.producto.precio.toFixed(2)}
                             </h4>
                           </div>
-                          <button className="delete">
+                          <button className="delete" onClick={() => deleteFromCart(item.itemId)}>
                             <i className="fa fa-close"></i>
                           </button>
                         </div>
                       ))}
+
                     </div>
                     <div className="cart-summary">
                       <h5>SUBTOTAL: $1,120.00</h5>

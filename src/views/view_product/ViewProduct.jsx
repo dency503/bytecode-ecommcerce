@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams,  useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import api from '../../utils/apiConfig';
 
 const ViewProduct = () => {
   const { id } = useParams();
@@ -19,6 +20,9 @@ const ViewProduct = () => {
       });
   }, [id]);
 
+  const addToCart =() => {
+    api.post(`/carrito/${id}/1`)
+  }
   if (error) {
     return <div className="container mt-5 text-danger">{error}</div>;
   }
