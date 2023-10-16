@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ProductoCard from "./ProductoCard";
-import { Swiper, SwiperSlide } from 'swiper/react';
-import 'swiper/css';
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
 import api from "../../utils/apiConfig";
 import axios from "axios";
 
@@ -38,22 +38,23 @@ import axios from "axios";
   // Agrega más productos según sea necesario
 ];*/
 
-
-
-
 const ProductoLista = () => {
   const [productos, setProductos] = useState([]);
+  const [activeTab, setActiveTab] = useState('tab1');
+  const [id, setId] = useState(1);
+  const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
   useEffect(() => {
     // Hacer una solicitud GET a la API para obtener la lista de productos
-    axios.get("http://localhost:8080/api/productos")
+    axios
+      .get(`${apiUrl}/productos/categoria/${id}?page=0&size=10`)
       .then((response) => {
         // Establecer los productos en el estado usando los datos de la respuesta
-        setProductos(response.data);
+        setProductos(response.data.content);
       })
       .catch((error) => {
         console.error("Error al obtener productos:", error);
       });
-  }, []);
+  }, [id]);
   return (
     <div className="section">
       <div className="container">
@@ -62,33 +63,39 @@ const ProductoLista = () => {
           <div className="col-md-12">
             <div className="section-title">
               <h3 className="title">Productos Nuevos</h3>
-              <div className="section-nav">
-                <ul className="section-tab-nav tab-nav">
-                  <li className="active">
-                    <a data-toggle="tab" href="#tab1">
-                      Laptops
-                    </a>
-                  </li>
-                  <li>
-                    <a data-toggle="tab" href="#tab1">
-                      Teléfonos
-                    </a>
-                  </li>
-                  <li>
-                    <a data-toggle="tab" href="#tab1">
-                      Cámaras
-                    </a>
-                  </li>
-                  <li>
-                    <a data-toggle="tab" href="#tab1">
-                      Accesorios
-                    </a>
-                  </li>
-                </ul>
+              <div className="section-tab-nav tab-nav">
+                <li className={activeTab === "tab1" ? "active" : ""}>
+                  <a
+                    data-toggle="tab"
+                    href="#tab1"
+                    onClick={() => {setId(1);setActiveTab("tab1")}}
+                  >
+                    Laptops
+                  </a>
+                </li>
+                <li className={activeTab === "tab2" ? "active" : ""}>
+                  <a
+                    data-toggle="tab"
+                    href="#tab2"
+                    onClick={() =>  {setId(2);setActiveTab("tab2")}}
+                  >
+                    Teléfonos
+                  </a>
+                </li>
+                <li className={activeTab === "tab3" ? "active" : ""}>
+                  <a
+                    data-toggle="tab"
+                    href="#tab3"
+                    onClick={() =>  {setId(3);setActiveTab("tab3")}}
+                  >
+                    Tablets
+                  </a>
+                </li>
+                
               </div>
             </div>
           </div>
-          
+
           {/* Pestañas de productos y carrusel */}
           <div className="col-md-12">
             <div className="row">
@@ -96,15 +103,14 @@ const ProductoLista = () => {
                 {/* Pestaña */}
                 <div id="tab1" className="tab-pane active">
                   <div className="products-slick" data-nav="#slick-nav-1">
-                    {/* Genera dinámicamente los productos */}<Swiper
+                    {/* Genera dinámicamente los productos */}
+                    <Swiper
                       spaceBetween={50}
                       slidesPerView={3}
-                      onSlideChange={() => console.log('slide change')}
-                      onSwiper={(swiper) => console.log(swiper)}
+                     
                     >
                       {productos.map((producto, index) => (
-                         
-                        <SwiperSlide key={index}>{console.log("el producto es"+ producto.nombreProducto)}
+                        <SwiperSlide key={index}>
                           <ProductoCard producto={producto} index={index} />
                         </SwiperSlide>
                       ))}

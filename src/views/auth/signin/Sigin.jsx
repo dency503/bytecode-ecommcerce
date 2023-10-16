@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useUserCart } from '../../../hooks/UserCartProvider';
 
 const SignInForm = () => {
+
+  const {  fetchData } = useUserCart();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -25,7 +28,7 @@ const SignInForm = () => {
       });
       const token = response.data.token;
       localStorage.setItem('token', token);
-      
+      fetchData()
       navigate("/"); // Redirige al usuario a la página principal después del inicio de sesión exitoso
     } catch (error) {
       console.error('Error al enviar la solicitud:', error);
@@ -33,7 +36,9 @@ const SignInForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <div className="container"> {/* Agregar una clase de contenedor */}
+  <div className="align-items-center justify-content-center" style={{ minHeight: "50vh" }}> {/* Estilos para centrar verticalmente */}
+    <form onSubmit={handleSubmit} className="mt-4">
       <div className="form-group">
         <label htmlFor="email">Email</label>
         <input
@@ -44,6 +49,8 @@ const SignInForm = () => {
           name="email"
           value={formData.email}
           onChange={handleChange}
+          autoComplete='username'
+          required
         />
       </div>
       <div className="form-group">
@@ -54,14 +61,22 @@ const SignInForm = () => {
           id="password"
           placeholder="Ingresa tu contraseña"
           name="password"
+          autoComplete='current-password'
           value={formData.password}
           onChange={handleChange}
+          required
         />
       </div>
       <button type="submit" className="btn btn-primary">
         Iniciar Sesión
       </button>
     </form>
+  </div>
+</div>
+
+  
+
+  
   );
 };
 

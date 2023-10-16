@@ -1,45 +1,23 @@
 import React, { useEffect, useState } from "react";
 import api from "../../utils/apiConfig";
+import useDocumentTitle from "../../hooks/useDocumentTitle";
+import useScrollTop from "../../hooks/useScrollTop";
 
 const UserProfile = () => {
-  const [usuario, setUsuario] = useState({
-    nombre: "Rodrigo Oliverio",
-    apellido: "Fernández",
-    direccion: "Calle Principal, 123",
-    pais: "El Salvador",
-    telefono: "+503 7063-6535",
-  });
-  const [direccionEnvio, setDireccionEnvio] = useState({
-    calle: "Avenida Secundaria, 456",
-    ciudad: "Ciudad de Envío",
-    codigoPostal: "54321",
-  });
+  useDocumentTitle("Cuenta | ByteCode")
+  useScrollTop()
 
-  const [metodosPago] = useState([
-    "Tarjeta de Crédito",
-    "PayPal",
-    "Transferencia Bancaria",
-  ]);
-  const [carrito] = useState([
-    {
-      id: 1,
-      nombre: "Producto 1",
-      precio: 50.0,
-      cantidad: 2,
-      image: "./img/product01.png",
-    },
-    {
-      id: 2,
-      nombre: "Producto 2",
-      precio: 30.0,
-      cantidad: 1,
-      image: "./img/product02.png",
-    },
-  ]);
-  const total = carrito.reduce(
-    (total, producto) => total + producto.precio * producto.cantidad,
-    0
-  );
+  const [usuario, setUsuario] = useState({
+    nombre: "", // Asegúrate de inicializar las propiedades del usuario
+    apellido: "",
+    email: "",
+    pais: "",
+    telefono: "",
+    direccion: "",
+  });
+  const handleSaveChanges = () => {};
+
+
   const [client, setClient] = useState({});
   useEffect(() => {
     // Hacer una solicitud GET a la API para obtener el nombre
@@ -64,10 +42,10 @@ const UserProfile = () => {
               className="img-fluid rounded-circle"
             />
             <button
-              id="btn-contact"
-              className="btn btn-primary btn-block mt-3"
-              data-toggle="modal"
-              data-target="#contactModal"
+              type="button"
+              className="btn btn-primary"
+              data-bs-toggle="modal"
+              data-bs-target="#contactModal"
             >
               Editar Perfil
             </button>
@@ -97,41 +75,113 @@ const UserProfile = () => {
                 </div>
               </div>
               <hr />
-              {client.direccion && <div className="card mt-3">
-                <div className="card-body">
-                  <h4 className="card-title">Dirección de Envío</h4>
-                  <p className="card-text">
-                    <strong>Linea 1:</strong>{" "}
-                    { client.direccion.linea1}
-                  </p>
+              {client.direccion && (
+                <div className="card mt-3">
+                  <div className="card-body">
+                    <h4 className="card-title">Dirección de Envío</h4>
+                    <p className="card-text">
+                      <strong>Linea 1:</strong> {client.direccion.linea1}
+                    </p>
 
-                  <p className="card-text">
-                    <strong>Distrito:</strong>{" "}
-                    {client.direccion.distrito.distrito}
-                  </p>
-                  <p className="card-text">
-                    <strong>Municipio:</strong>{" "}
-                    {  client.direccion.distrito.municipio.municipio}
-                  </p>
+                    <p className="card-text">
+                      <strong>Distrito:</strong>{" "}
+                      {client.direccion.distrito.distrito}
+                    </p>
+                    <p className="card-text">
+                      <strong>Municipio:</strong>{" "}
+                      {client.direccion.distrito.municipio.municipio}
+                    </p>
 
-                  <p className="card-text">
-                    <strong>Departamento:</strong>{" "}
-                    {
-                       client.direccion.distrito.municipio.departamento
-                        .departamento
-                    }
-                  </p>
-                  <p className="card-text">
-                    <strong>Código Postal:</strong>{" "}
-                    { client.direccion.codigoPostal}
-                  </p>
+                    <p className="card-text">
+                      <strong>Departamento:</strong>{" "}
+                      {
+                        client.direccion.distrito.municipio.departamento
+                          .departamento
+                      }
+                    </p>
+                    <p className="card-text">
+                      <strong>Código Postal:</strong>{" "}
+                      {client.direccion.codigoPostal}
+                    </p>
+                  </div>
                 </div>
-              </div>}
+              )}
 
               <hr />
-              
             </div>
-           
+          </div>
+        </div>
+        <div className="container section mt-5">
+          {/* Resto del contenido... */}
+          <div
+            div
+            className="modal fade"
+            id="contactModal"
+            tabIndex="-1"
+            aria-labelledby="exampleModalLabel"
+            aria-hidden="true"
+          >
+            <div className="modal-dialog" role="document">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title" id="exampleModalLabel">
+                    Editar Perfil
+                  </h5>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  ></button>
+                </div>
+                <div className="modal-body">
+                  {/* Contenido del formulario para editar el perfil */}
+                  <form>
+                    <div className="form-group">
+                      <label htmlFor="nombre">Nombre</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        id="nombre"
+                        value={usuario.nombre}
+                        onChange={(e) =>
+                          setUsuario({ ...usuario, nombre: e.target.value })
+                        }
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="apellido">Apellido</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        id="apellido"
+                        value={usuario.apellido}
+                        onChange={(e) =>
+                          setUsuario({ ...usuario, apellido: e.target.value })
+                        }
+                      />
+                    </div>
+                    {/* ... otros campos de usuario ... */}
+                  </form>
+                </div>
+                <div className="modal-footer">
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    
+                  >
+                    Cerrar
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={handleSaveChanges}
+                  >
+                    Guardar Cambios
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
