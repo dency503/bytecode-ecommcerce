@@ -2,12 +2,24 @@ import React, { useEffect, useState } from "react";
 import { Container } from "react-bootstrap";
 import api from "../../utils/apiConfig";
 import { useUserCart } from "../../hooks/UserCartProvider";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+
 const Header = () => {
   const { name, cart, fetchData } = useUserCart();
   const [categorias, setCategorias] = useState([]);
   const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
+  const handleSearch = (event) => {
+    event.preventDefault();
+
+    // Realiza acciones de búsqueda si es necesario
+    // ...
+
+    // Redirige a la página de resultados de búsqueda con el término de búsqueda como parámetro
+    navigate(`/busqueda/${searchQuery}`);
+  };
   const deleteFromCart = async (id) => {
     try {
       const response = await api.delete(`/carrito/item/${id}`);
@@ -35,7 +47,7 @@ const Header = () => {
       fetchData();
     } else {
       // Lógica para manejar la ausencia de token, si es necesario
-      console.log("No hay token de usuario.");
+
     }
 
     // Hacer la solicitud GET usando Axios
@@ -100,30 +112,40 @@ const Header = () => {
 
             <div className="col-md-6">
               <div className="header-search">
-                <form>
+                <form onSubmit={handleSearch}>
                   <select className="input-select">
                     <option value="0">Categorias</option>
                     {categorias.map((categoria) => (
-                      <option value={categoria.categoriaId}>
+                      <option
+                        value={categoria.categoriaId}
+                        key={categoria.categoriaId}
+                      >
                         {categoria.nombreCategoria}
                       </option>
                     ))}
                   </select>
-                  <input className="input" placeholder="Search here" />
-                  <button className="search-btn">Buscar</button>
+                  <input
+                    className="input"
+                    placeholder="Search here"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                  <button type="submit" className="search-btn">
+                    Buscar
+                  </button>
                 </form>
               </div>
             </div>
 
             <div className="col-md-3 clearfix">
               <div className="header-ctn">
-                <div>
+                {/*<div>
                   <a href="#">
                     <i className="fa fa-heart-o"></i>
                     <span>Tus favoritos</span>
                     <div className="qty">2</div>
                   </a>
-                </div>
+                    </div>*/}
 
                 <div className="dropdown">
                   <a

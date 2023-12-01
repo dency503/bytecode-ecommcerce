@@ -29,7 +29,7 @@ export const UserCartProvider = ({ children }) => {
     if (token) {
       fetchData();
     } else {
-      console.log("No hay token de usuario.");
+
     }
   }, []);
 

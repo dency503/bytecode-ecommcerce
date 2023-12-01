@@ -4,57 +4,44 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import api from "../../utils/apiConfig";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
-/*const productos = [
-  {
-    imagen: "./img/product01.png",
-    categoria: "Laptops",
-    nombre: "Producto 1",
-    precio: 980.0,
-    precioAnterior: 990.0,
-    rating: 5,
-    nuevo: true,
-    etiquetas: ["-30%"],
-  },
-  {
-    imagen: "./img/product02.png",
-    categoria: "Teléfonos",
-    nombre: "Producto 2",
-    precio: 880.0,
-    precioAnterior: 900.0,
-    rating: 4,
-    nuevo: true,
-  },
-  {
-    imagen: "./img/product03.png",
-    categoria: "Cámaras",
-    nombre: "Producto 3",
-    precio: 750.0,
-    precioAnterior: 800.0,
-    rating: 3,
-    nuevo: true,
-    etiquetas: ["-10%"],
-  },
-  // Agrega más productos según sea necesario
-];*/
 
 const ProductoLista = () => {
   const [productos, setProductos] = useState([]);
   const [activeTab, setActiveTab] = useState('tab1');
   const [id, setId] = useState(1);
+  const [dataCache, setDataCache] = useState({});
   const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
+
   useEffect(() => {
-    // Hacer una solicitud GET a la API para obtener la lista de productos
-    axios
-      .get(`${apiUrl}/productos/categoria/${id}?page=0&size=10`)
-      .then((response) => {
-        // Establecer los productos en el estado usando los datos de la respuesta
-        setProductos(response.data.content);
-      })
-      .catch((error) => {
-        console.error("Error al obtener productos:", error);
-      });
-  }, [id]);
+    // Verificar si los datos ya están en caché
+    if (dataCache[id]) {
+      setProductos(dataCache[id]);
+    } else {
+      // Hacer una solicitud GET a la API solo si los datos no están en caché
+      axios
+        .get(`${apiUrl}/productos/categoria/${id}?page=0&size=10`)
+        .then((response) => {
+          // Establecer los productos en el estado usando los datos de la respuesta
+          setProductos(response.data.content);
+          // Guardar los datos en caché
+          setDataCache((prevDataCache) => ({
+            ...prevDataCache,
+            [id]: response.data.content,
+          }));
+        })
+        .catch((error) => {
+          console.error("Error al obtener productos:", error);
+        });
+    }
+  }, [id, dataCache]);
+
+  const handleTabClick = (categoryId) => {
+    setId(categoryId);
+    setActiveTab(`tab${categoryId}`);
+  };
+
   return (
     <div className="section">
       <div className="container">
@@ -68,7 +55,7 @@ const ProductoLista = () => {
                   <a
                     data-toggle="tab"
                     href="#tab1"
-                    onClick={() => {setId(1);setActiveTab("tab1")}}
+                    onClick={() => handleTabClick(1)}
                   >
                     Laptops
                   </a>
@@ -77,7 +64,7 @@ const ProductoLista = () => {
                   <a
                     data-toggle="tab"
                     href="#tab2"
-                    onClick={() =>  {setId(2);setActiveTab("tab2")}}
+                    onClick={() => handleTabClick(2)}
                   >
                     Teléfonos
                   </a>
@@ -86,12 +73,11 @@ const ProductoLista = () => {
                   <a
                     data-toggle="tab"
                     href="#tab3"
-                    onClick={() =>  {setId(3);setActiveTab("tab3")}}
+                    onClick={() => handleTabClick(3)}
                   >
                     Tablets
                   </a>
                 </li>
-                
               </div>
             </div>
           </div>
@@ -107,9 +93,8 @@ const ProductoLista = () => {
                     <Swiper
                       spaceBetween={50}
                       slidesPerView={3}
-                     
                     >
-                      {productos.map((producto, index) => (
+                      {productos && productos.map((producto, index) => (
                         <SwiperSlide key={index}>
                           <ProductoCard producto={producto} index={index} />
                         </SwiperSlide>
@@ -127,6 +112,4 @@ const ProductoLista = () => {
       </div>
     </div>
   );
-};
-
-export default ProductoLista;
+};export default ProductoLista;

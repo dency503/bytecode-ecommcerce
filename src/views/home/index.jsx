@@ -5,9 +5,11 @@ import ProductoLista from '../../components/common/ProductoLista';
 import HotDeal from '../../components/common/HotDeal';
 import Newsletter from '../../components/common/Newsletter';
 import useDocumentTitle from '../../hooks/useDocumentTitle';
-
+import jwt_decode from "jwt-decode";
 const Home = () => {
   useDocumentTitle("Inicio | Bytecode")
+                                                                                                                                                                                                                                                                                                                                                                                                                                     
+
   return (
     
     <div><CategoriaProducto/>

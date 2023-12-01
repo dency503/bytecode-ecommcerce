@@ -3,7 +3,7 @@ import api from "../../utils/apiConfig";
 import useDocumentTitle from "../../hooks/useDocumentTitle";
 import useScrollTop from "../../hooks/useScrollTop";
 
-const UserProfile = () => {
+const Account = () => {
   useDocumentTitle("Cuenta | ByteCode")
   useScrollTop()
 
@@ -189,4 +189,4 @@ const UserProfile = () => {
   );
 };
 
-export default UserProfile;
+export default Account;
