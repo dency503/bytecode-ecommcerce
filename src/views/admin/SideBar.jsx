@@ -3,7 +3,7 @@ import { Col, Nav, Navbar } from "react-bootstrap";
 import { NavLink, useLocation } from "react-router-dom"; // Importa NavLink y useLocation
 import * as ROUTES from "@/constants/routes";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChartBar, faCube, faBriefcase, faList, faSitemap, faUser, faTags, faTruck } from "@fortawesome/free-solid-svg-icons";
+import { faChartBar, faCube, faBriefcase, faList, faSitemap, faUser, faTags, faTruck, faMoneyBillWave } from "@fortawesome/free-solid-svg-icons";
 
 const Sidebar = () => {
     const location = useLocation();
@@ -39,6 +39,9 @@ const Sidebar = () => {
           <NavLink to={ROUTES.ADMIN_PROVEEDORES} className="nav-link text-light" activeClassName="active">
             <FontAwesomeIcon icon={faTruck} /> Proveedores
           </NavLink>
+          <NavLink to={ROUTES.ADMIN_VENTAS} className="nav-link text-light" activeClassName="active">
+          <FontAwesomeIcon icon={faMoneyBillWave} /> Ventas
+        </NavLink>
           {/* Enlace externo a YouTube */}
           <NavLink to="https://www.youtube.com/watch?v=dQw4w9WgXcQ" className="nav-link text-light" target="_blank" rel="noopener noreferrer">
         Configuración

@@ -31,6 +31,8 @@ import GestionarCargo from "../views/admin/GestionarCargo";
 import * as ROUTES from '@/constants/routes';
 import GestionarProveedor from "../views/admin/GestionarProveedor";
 import GestionarCliente from "../views/admin/GestionarClientes";
+import GestionarVenta from "../views/admin/GestionarVenta";
+
 // Import AboutUs if it exists
 // import AboutUs from "@/views/AboutUs";
 
@@ -49,7 +51,7 @@ const AppRouter = () => {
             <Route path={ROUTES.BUSQUEDA} element={<BusquedaProducto />} />
             <Route path={ROUTES.VIEW_PRODUCT} element={<ViewProduct />} />
             <Route path={ROUTES.LISTA_CATEGORIA} element={<ListaCategoria />} />
-
+            
             {/* Admin Routes */}
             <Route
               path={ROUTES.ADMIN_DASHBOARD}
@@ -79,6 +81,10 @@ const AppRouter = () => {
             <Route
               path={ROUTES.ADMIN_CARGOS}
               element={<AdminRoute path={ROUTES.ADMIN_CARGOS} component={GestionarCargo} />}
+            />
+            <Route
+              path={ROUTES.ADMIN_VENTAS}
+              element={<AdminRoute path={ROUTES.ADMIN_VENTAS} component={GestionarVenta} />}
             />
             <Route
               path={ROUTES.ADMIN_PROVEEDORES}

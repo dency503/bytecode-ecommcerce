@@ -157,18 +157,18 @@ const Header = () => {
                   >
                     <i className="fa fa-shopping-cart"></i>
                     <span>Carrito</span>
-                    {cart.items && (
-                      <div className="qty"> {cart.items.length}</div>
+                    {cart?.items && (
+                      <div className="qty"> {cart.items?.length}</div>
                     )}
                   </a>
-                  {cart.items && cart.items.length > 0 ? (
+                  {cart?.items && cart.items?.length > 0 ? (
                     <div
                       className="dropdown-menu"
                       aria-labelledby="cartDropdown"
                     >
                       <div className="cart-list">
                         {cart.items &&
-                          cart.items.map((item) => (
+                          cart.items?.map((item) => (
                             <div key={item.itemId} className="product-widget">
                               <div className="product-img">
                                 <img

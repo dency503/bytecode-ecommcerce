@@ -17,7 +17,7 @@ export const UserCartProvider = ({ children }) => {
       const usernameResponse = await api.get("/v1/auth/username");
       setName(usernameResponse.data);
 
-      const cartResponse = await api.get("/carrito/");
+      const cartResponse = await api.get("/carrito");
       setCart(cartResponse.data);
     } catch (error) {
       console.error("Error al obtener datos:", error);

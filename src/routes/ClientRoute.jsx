@@ -5,7 +5,7 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import jwtDecode from 'jwt-decode';
 
-
+import * as ROUTES from '@/constants/routes';
 
 const PrivateRoute = ({ isAuth, component: Component }) => {
   const navigate = useNavigate();
@@ -32,16 +32,16 @@ const PrivateRoute = ({ isAuth, component: Component }) => {
       navigate("/SIGNIN");
     } else if (decodedToken.role === 'ADMIN') {
       // Redirect to admin dashboard for users with 'ADMIN' role
-      navigate("ADMIN_DASHBOARD");
+      navigate(ROUTES.ADMIN_DASHBOARD);
     }
   }, [isAuth, navigate]);
 
   // If the user is authenticated and not an admin, render the component
-  return isAuth ? (
+  return  (
     <main className="content">
       <Component />
     </main>
-  ) : null;
+  ) ;
 };
 
 PrivateRoute.defaultProps = {

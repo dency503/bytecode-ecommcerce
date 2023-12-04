@@ -4,6 +4,7 @@ export const ADMIN_CLIENTES = '/admin/clientes';
 export const ADMIN_PRODUCTO = '/admin/productos';
 export const ADMIN_CARGOS = '/admin/cargos';
 export const ADMIN_CATEGORIAS = '/admin/categorias';
+export const ADMIN_VENTAS = '/admin/ventas';
 export const ADMIN_EMPLEADOS = '/admin/empleados';
 export const ADMIN_PROVEEDORES = '/admin/proveedores';
 export const ADMIN_MARCAS = '/admin/marcas';

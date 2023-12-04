@@ -28,7 +28,7 @@ const AdminRoute = ({ isAuth, component: Component, ...rest }) => {
   useEffect(() => {
     const token = getToken();
     const decodedToken = token ? decodeToken(token) : null;
-    console.log("el usuario es "+ decodedToken);
+
     if ( !decodedToken || (decodedToken && decodedToken.role !== 'ADMIN')) {
       
       

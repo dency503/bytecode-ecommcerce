@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Toast } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import ReactPhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css"; // Import the styles
-
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const SignUpForm = () => {
   const [formData, setFormData] = useState({
     username: "",
@@ -14,6 +15,7 @@ const SignUpForm = () => {
     apellidoCliente: "",
     telefono: "",
     direccion: {
+      idDistrito:"",
       linea1: "",
       distrito: "",
       codigoPostal: "",
@@ -24,6 +26,7 @@ const SignUpForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
   const [showToast, setShowToast] = useState(false);
+  const [distritos, setDistritos] = useState([]);
   const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
   const navigate = useNavigate();
   const handleChange = (e) => {
@@ -32,7 +35,18 @@ const SignUpForm = () => {
       [e.target.name]: e.target.value,
     });
   };
+  useEffect(() => {
+    const obtenerDistritos = async () => {
+      try {
+        const response = await axios.get(`${apiUrl}/distritos`);
+        setDistritos(response.data.content);
+      } catch (error) {
+        console.error("Error al obtener distritos:", error);
+      }
+    };
 
+    obtenerDistritos();
+  }, []);
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -40,24 +54,30 @@ const SignUpForm = () => {
       setIsSubmitting(true);
       const response = await axios.post(`${apiUrl}/v1/auth/signup`, formData);
       console.log("Signup Successful:", response.data);
+      toast.success("Signup Successful");
       navigate("/signIn");
-      // Handle success, e.g., redirect to login page
     } catch (error) {
-      console.log("Error es" + error.response);
+      console.log("Error es", formData.direccion);
       console.error("Error during signup:", error.response.data);
-      setSubmitError("An error occurred during signup. Please try again.");
-      setShowToast(true);
+      toast.error("An error occurred during signup. Please try again.");
 
       // Oculta el toast después de 5 segundos
       setTimeout(() => {
-        setShowToast(false);
-        setSubmitError(null);
-      }, 3000);
+        toast.dismiss();
+      }, 5000);
     } finally {
       setIsSubmitting(false);
     }
   };
-
+  const handleAddressChange = (value, name) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      direccion: {
+        ...prevData.direccion,
+        [name]: value,
+      },
+    }));
+  };
   return (
     <div className="container mt-5">
       <div
@@ -211,16 +231,23 @@ const SignUpForm = () => {
               <label htmlFor="distrito" className="form-label">
                 Distrito
               </label>
-              <input
-                type="text"
-                className="form-control"
+              <select
+                className="form-select"
                 id="distrito"
                 name="distrito"
                 value={formData.direccion.distrito}
                 onChange={(e) => handleAddressChange(e.target.value, "distrito")}
                 required
-                placeholder="Enter your district"
-              />
+              >
+                <option value="" disabled>
+                  Seleccione un distrito
+                </option>
+                {distritos && distritos.map((distrito) => (
+                  <option key={distrito.idDistrito} value={distrito.idDistrito}>
+                    {distrito.distrito}
+                  </option>
+                ))}
+              </select>
             </div>
             <button type="submit" className="btn btn-primary">
               {isSubmitting ? (
@@ -255,7 +282,7 @@ const SignUpForm = () => {
             </Toast>
           </form>
         </div>
-      </div>
+      </div><ToastContainer/>
     </div>
   );
 };
