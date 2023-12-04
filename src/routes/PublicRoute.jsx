@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import jwtDecode from 'jwt-decode';  // Asegúrate de instalar la biblioteca jwt-decode
 
 import { SignInForm, SignUpForm } from '@/views';
-
+import * as ROUTES from '@/constants/routes';
 const PublicRoute = ({ isAuth, component: Component, path }) => {
   const navigate = useNavigate();
 
@@ -20,12 +20,13 @@ const PublicRoute = ({ isAuth, component: Component, path }) => {
     try {
       // Decodifica el token para obtener la información, incluido el rol
       const decodedToken = jwtDecode(token);
-
-      if (isAuth && decodedToken.role === 'ADMIN') {
+     
+      if ( decodedToken.role === 'ADMIN') {
         // Si es un administrador, redirige al panel de administrador
-        navigate(ADMIN_DASHBOARD);
-      } else if ((isAuth && decodedToken.role === 'USER') && (path === SignInForm || path === SignUpForm)) {
+        navigate(ROUTES.ADMIN_DASHBOARD);
+      } else if (( decodedToken.role === 'USER') && (path === "/signup" || path === "/signin")) {
         // Si es un usuario y está intentando acceder a las páginas de inicio de sesión o registro, redirige a la página principal
+        console.log("token "+decodedToken.role)
         navigate('/');
       }
     } catch (error) {

@@ -162,6 +162,66 @@ const SignUpForm = () => {
                 className="form-control"
               />
             </div>
+            <div className="mb-3">
+              <label htmlFor="codigoPostal" className="form-label">
+                Código Postal
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                id="codigoPostal"
+                name="codigoPostal"
+                value={formData.direccion.codigoPostal}
+                onChange={(e) => handleAddressChange(e.target.value, "codigoPostal")}
+                required
+                placeholder="Enter your postal code"
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="pais" className="form-label">
+                País
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                id="pais"
+                name="pais"
+                value={formData.direccion.pais}
+                onChange={(e) => handleAddressChange(e.target.value, "pais")}
+                required
+                placeholder="Enter your country"
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="linea1" className="form-label">
+                Dirección
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                id="linea1"
+                name="linea1"
+                value={formData.direccion.linea1}
+                onChange={(e) => handleAddressChange(e.target.value, "linea1")}
+                required
+                placeholder="Enter your address"
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="distrito" className="form-label">
+                Distrito
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                id="distrito"
+                name="distrito"
+                value={formData.direccion.distrito}
+                onChange={(e) => handleAddressChange(e.target.value, "distrito")}
+                required
+                placeholder="Enter your district"
+              />
+            </div>
             <button type="submit" className="btn btn-primary">
               {isSubmitting ? (
                 <div className="spinner-border text-light" role="status"></div>

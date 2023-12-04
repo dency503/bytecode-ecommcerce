@@ -83,30 +83,32 @@ const Footer = () => {
               <ul className="footer-payments">
                 <li>
                   <a href="#">
-                    <i className="fa fa-cc-visa" style={{ color: "rgb(46, 42, 165)" }}></i>
+                    <i className="fa fa-cc-visa" style={{ color: "white" }}></i>
                   </a>
                 </li>
                 <li>
                   <a href="#">
-                    <i className="fa fa-credit-card" style={{ color: "rgb(255, 255, 255)" }}></i>
+                    <i className="fa fa-credit-card" style={{ color: "white" }}></i>
                   </a>
                 </li>
                 <li>
                   <a href="#">
-                    <i className="fa fa-cc-paypal" style={{ color: "rgb(42, 165, 165)" }}></i>
+                    <i className="fa fa-cc-paypal" style={{ color: "white" }}></i>
                   </a>
                 </li>
                 <li>
                   <a href="#">
-                    <i className="fa fa-cc-mastercard" style={{ color: "rgb(165, 42, 42)" }}></i>
+                    <i className="fa fa-cc-mastercard" style={{ color: "white" }}></i>
                   </a>
                 </li>
               </ul>
-              <span className="copyright">
-                Derechos de autor &copy;
-            {new Date().getFullYear()} Todos los derechos reservados |
-                Esta plantilla está hecha con <i className="fa fa-heart-o" aria-hidden="true"></i> 
-              </span>
+              <div className="copyright">
+                <p>
+                  <span>
+                    &copy; {new Date().getFullYear()} ByteCode. Todos los derechos reservados.
+                  </span>
+                </p>
+              </div>
             </div>
           </div>
         </div>
