@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import api from "../utils/apiConfig";
+import { toast } from "react-toastify";
 
 
 const UserCartContext = createContext();
@@ -20,7 +21,7 @@ export const UserCartProvider = ({ children }) => {
       const cartResponse = await api.get("/carrito");
       setCart(cartResponse.data);
     } catch (error) {
-      console.error("Error al obtener datos:", error);
+      toast.error("Error al obtener datos:", error);
     }
   };
 

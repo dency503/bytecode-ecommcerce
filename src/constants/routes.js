@@ -16,3 +16,4 @@ export const BUSQUEDA = '/busqueda/:termino';
 export const VIEW_PRODUCT = '/products/:id';
 export const LISTA_CATEGORIA = '/categoria/:categoriaId';
 export const ADMIN_PANEL = '/admin/list/';
+export const CHECKOUT = '/checkout/';

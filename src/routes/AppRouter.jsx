@@ -32,15 +32,18 @@ import * as ROUTES from '@/constants/routes';
 import GestionarProveedor from "../views/admin/GestionarProveedor";
 import GestionarCliente from "../views/admin/GestionarClientes";
 import GestionarVenta from "../views/admin/GestionarVenta";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
 
 // Import AboutUs if it exists
 // import AboutUs from "@/views/AboutUs";
 
+const stripePromise = loadStripe('pk_test_51NSnNyHIuJM4DUM4d2HAjUjbbZL6ohUetGKHwFKkKVOOIf7c5HxpRaBiZX6oANuJLnIkwPXeaqK4cpufWH9tdNEr00ZuUTIv2u');
 const AppRouter = () => {
   return (
     <>
       <UserCartProvider>
-        <Router>
+         <Elements stripe={stripePromise}><Router>
           <Header />
           <Nav />
           <Routes>
@@ -95,7 +98,7 @@ const AppRouter = () => {
             <Route path="*" element={<Page404 />} />
           </Routes>
           <Footer />
-        </Router>
+        </Router></Elements>
       </UserCartProvider>
     </>
   );

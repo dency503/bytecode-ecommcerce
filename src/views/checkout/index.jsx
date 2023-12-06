@@ -1,24 +1,124 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useUserCart } from "../../hooks/UserCartProvider";
 import api from "../../utils/apiConfig";
+import "react-toastify/dist/ReactToastify.css";
+import {
+  CardElement,
+
+  useElements,
+  useStripe,
+} from "@stripe/react-stripe-js";
+
+import { Button } from "react-bootstrap";
+import { ToastContainer, toast } from "react-toastify";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 
 const CheckOut = () => {
   const { cart } = useUserCart();
-  const [differentShippingAddress, setDifferentShippingAddress] =
-    useState(false);
-    const [client, setClient] = useState({});
-    useEffect(() => {
-        // Hacer una solicitud GET a la API para obtener el nombre
-        api
-          .get("/v1/auth/user")
-          .then((response) => {
-            // Establecer el nombre en el estado usando los datos de la respuesta
-            setClient(response.data);
-          })
-          .catch((error) => {
-            console.error("Error al obtener productos:", error);
-          });
-      }, [localStorage.getItem("token")]);
+  const navigate =useNavigate();
+
+  const [cardComplete, setCardComplete] = useState(false);
+
+  const stripe = useStripe();
+  const elements = useElements();
+  const handleCardChange = (event) => {
+    // Puedes realizar validaciones adicionales aquí según tus necesidades
+    setCardComplete(event.complete);
+
+    
+  };
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    const cardElement = elements.getElement(CardElement);
+
+    try {
+      const { token } = await stripe.createToken(cardElement);
+
+      // Handle the token (e.g., send it to your server for payment processing)
+  
+      const orderDescription = cart.items
+        ? cart.items
+            .map(
+              (item, index) =>
+                `(${item.cantidad}x) ${
+                  item.producto.nombreProducto
+                } - $${item.producto.precio.toFixed(2)}`
+            )
+            .join("\n")
+        : "";
+      // Example with createPaymentMethod:
+      const { data } = await axios.post(`${apiUrl}/payment/create`, {
+        paymentMethodId: token.id,
+    
+
+        description: orderDescription,
+        amount:
+          cart.items &&
+          cart.items
+            .reduce(
+              (total, item) => total + item.cantidad * item.producto.precio,
+              0
+            )
+            .toFixed(2) * 100, // Set the amount in cents (e.g., 1000 for $10.00)
+        currency: "usd",
+      });
+
+      // Once you have the clientSecret, you can use it to confirm the payment
+     const  result = await stripe.confirmCardPayment(
+        data.client_secret,
+        {
+          payment_method: {
+            card: cardElement,billing_details: {
+              name: client.nombreCliente + " "+ client.apellidoCliente,
+              email: client.email,
+              phone: client.telefono,
+              address: {
+                city: client.direccion.distrito.distrito,
+                country: "SV",
+                line1:  client.direccion.line1,
+                
+                postal_code:  client.direccion.codigoPostal,
+                state: client.direccion.distrito.municipio.departamento.departamento,
+                
+              },
+            },
+          },
+        }
+        
+      );
+       await axios.post(`${apiUrl}/payment/sucesss`, {
+        paymentIntentId: result.paymentIntent.id,
+        carritoId: cart.carritoId
+      });
+      toast.success("Pago Realizado", {
+        onClose: () => {
+          // Después de cerrar el toast, redirigir
+          navigate("/");
+        },
+      });
+    } catch (error) {
+      // Handle errors during token creation or API requests
+      console.error(error);
+    }
+  };
+
+  const [client, setClient] = useState({});
+  useEffect(() => {
+    // Hacer una solicitud GET a la API para obtener el nombre
+    api
+      .get("/v1/auth/user")
+      .then((response) => {
+        // Establecer el nombre en el estado usando los datos de la respuesta
+        setClient(response.data);
+        
+      })
+      .catch((error) => {
+        console.error("Error al obtener productos:", error);
+      });
+  }, [localStorage.getItem("token")]);
   return (
     <div>
       <div id="breadcrumb" className="section">
@@ -51,7 +151,6 @@ const CheckOut = () => {
                     type="text"
                     value={client.nombreCliente}
                     name="firstName"
-                
                     readOnly
                   />
                 </div>
@@ -60,7 +159,6 @@ const CheckOut = () => {
                     className="input"
                     type="text"
                     name="lastName"
-                  
                     value={client.apellidoCliente}
                     readOnly
                   />
@@ -82,21 +180,23 @@ const CheckOut = () => {
                     value={client.direccion && client.direccion.linea1}
                   />
                 </div>
+                
                 <div className="form-group">
                   <input
                     className="input"
                     type="text"
                     name="city"
                     value={
-                        client.direccion && client.direccion.distrito.municipio.departamento
-                          .departamento
-                      }
+                      client.direccion &&
+                      client.direccion.distrito.municipio.departamento
+                        .departamento
+                    }
                     readOnly
                   />
                 </div>
                 <div className="form-group">
                   <input
-                    className="input"
+                    className="input"codigoPostal
                     type="text"
                     name="country"
                     value={client.direccion && client.direccion.pais}
@@ -121,118 +221,10 @@ const CheckOut = () => {
                     readOnly
                   />
                 </div>
-                <div className="form-group">
-                  <div className="input-checkbox">
-                    <input type="checkbox" id="create-account" />
-                    <label htmlFor="create-account">
-                      <span></span>
-                      ¿Crear cuenta?
-                    </label>
-                    {differentShippingAddress && (
-                      <div className="caption">
-                        <p>
-                          Lorem ipsum dolor sit amet, consectetur adipisicing
-                          elit, sed do eiusmod tempor incididunt.
-                        </p>
-                        <input
-                          className="input"
-                          type="password"
-                          name="password"
-                          placeholder="Ingresa tu Contraseña"
-                        />
-                      </div>
-                    )}
-                  </div>
-                </div>
+                
               </div>
 
-              <div className="shiping-details">
-                <div className="section-title">
-                  <h3 className="title">Dirección de envío</h3>
-                </div>
-                <div className="input-checkbox">
-                  <input
-                    type="checkbox"
-                    id="shiping-address"
-                    checked={differentShippingAddress}
-                    onChange={() =>
-                      setDifferentShippingAddress(!differentShippingAddress)
-                    }
-                  />
-                  <label htmlFor="shiping-address">
-                    <span></span>
-                    ¿Enviar a una dirección diferente?
-                  </label>
-                  {differentShippingAddress && (
-                    <div className="caption">
-                      <div className="form-group">
-                        <input
-                          className="input"
-                          type="text"
-                          name="shippingFirstName"
-                          placeholder="Nombre"
-                        />
-                      </div>
-                      <div className="form-group">
-                        <input
-                          className="input"
-                          type="text"
-                          name="shippingLastName"
-                          placeholder="Apellido"
-                        />
-                      </div>
-                      <div className="form-group">
-                        <input
-                          className="input"
-                          type="email"
-                          name="shippingEmail"
-                          placeholder="Correo Electrónico"
-                        />
-                      </div>
-                      <div className="form-group">
-                        <input
-                          className="input"
-                          type="text"
-                          name="shippingAddress"
-                          placeholder="Dirección"
-                        />
-                      </div>
-                      <div className="form-group">
-                        <input
-                          className="input"
-                          type="text"
-                          name="shippingCity"
-                          placeholder="Ciudad"
-                        />
-                      </div>
-                      <div className="form-group">
-                        <input
-                          className="input"
-                          type="text"
-                          name="shippingCountry"
-                          placeholder="País"
-                        />
-                      </div>
-                      <div className="form-group">
-                        <input
-                          className="input"
-                          type="text"
-                          name="shippingZipCode"
-                          placeholder="Código Postal"
-                        />
-                      </div>
-                      <div className="form-group">
-                        <input
-                          className="input"
-                          type="tel"
-                          name="shippingTel"
-                          placeholder="Teléfono"
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
+             
 
               <div className="order-notes">
                 <textarea
@@ -258,14 +250,12 @@ const CheckOut = () => {
                     </div>
                   ))}
 
-<div className="order-col">
-  <div className="col-6">Envío</div>
-  <div className="col-6 text-right">
-    <strong>
-      Gratis
-    </strong>
-  </div>
-</div>
+                <div className="order-col">
+                  <div className="col-6">Envío</div>
+                  <div className="col-6 text-right">
+                    <strong>Gratis</strong>
+                  </div>
+                </div>
 
                 <div className="order-col">
                   <div>
@@ -275,13 +265,13 @@ const CheckOut = () => {
                     <strong className="order-total">
                       $
                       {cart.items &&
-                            cart.items
-                              .reduce(
-                                (total, item) =>
-                                  total + item.cantidad * item.producto.precio,
-                                0
-                              )
-                              .toFixed(2)}
+                        cart.items
+                          .reduce(
+                            (total, item) =>
+                              total + item.cantidad * item.producto.precio,
+                            0
+                          )
+                          .toFixed(2)}
                     </strong>
                   </div>
                 </div>
@@ -292,46 +282,30 @@ const CheckOut = () => {
                   <input type="radio" name="payment" id="payment-1" />
                   <label htmlFor="payment-1">
                     <span></span>
-                    Transferencia Bancaria Directa
+                    Stripe
                   </label>
-                  <div className="caption">
-                    <p>
-                      Selecciona esta opción si deseas realizar una
-                      transferencia bancaria directa para pagar tu pedido.
-                    </p>
-                  </div>
-                </div>
-                <div className="input-radio">
-                  <input type="radio" name="payment" id="payment-2" />
-                  <label htmlFor="payment-2">
-                    <span></span>
-                    Pago con Cheque
-                  </label>
-                  <div className="caption">
-                    <p>
-                      Elige esta opción si deseas pagar tu pedido mediante un
-                      cheque. Asegúrate de que el cheque esté a nombre de
-                      nuestra empresa.
-                    </p>
-                  </div>
-                </div>
-                <div className="input-radio">
-                  <input type="radio" name="payment" id="payment-3" />
-                  <label htmlFor="payment-3">
-                    <span></span>
-                    Sistema Paypal
-                  </label>
-                  <div className="caption">
-                    <p>
-                      Utiliza esta opción si prefieres realizar el pago a través
-                      del sistema Paypal. Serás redirigido a la plataforma de
-                      Paypal para completar la transacción.
-                    </p>
-                  </div>
                 </div>
               </div>
               {/* /Métodos de pago */}
-
+              <CardElement
+                id="my-card"
+                onChange={handleCardChange}
+                options={{
+                  iconStyle: "solid",
+                  style: {
+                    base: {
+                      iconColor: "#c4f0ff",
+                      color: "#000000",
+                      fontSize: "16px",
+                    },
+                    invalid: {
+                      iconColor: "#FFC7EE",
+                      color: "#FFC7EE",
+                    },
+                  },
+                  hidePostalCode: true, // Oculta el campo del código postal
+                }}
+              />
               <div className="input-checkbox">
                 <input type="checkbox" id="terms" required />
                 <label htmlFor="terms">
@@ -339,13 +313,16 @@ const CheckOut = () => {
                   He leído y acepto los <a href="#">términos y condiciones</a>
                 </label>
               </div>
-              <a href="#" className="primary-btn order-submit">
-                Realizar Pedido
-              </a>
+              <form onSubmit={handleSubmit}>
+                <Button type="submit" className="primary-btn order-submit">
+                  Realizar Pedido
+                </Button>
+              </form>
             </div>
           </div>
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 };

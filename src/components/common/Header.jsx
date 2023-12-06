@@ -4,7 +4,7 @@ import api from "../../utils/apiConfig";
 import { useUserCart } from "../../hooks/UserCartProvider";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-
+import * as ROUTES from '@/constants/routes';
 const Header = () => {
   const { name, cart, fetchData } = useUserCart();
   const [categorias, setCategorias] = useState([]);
@@ -208,7 +208,7 @@ const Header = () => {
                         </h5>
                       </div>
                       <div className="cart-btns">
-                        <Link className="dropdown-item" to="/checkout">
+                        <Link className="dropdown-item" to= {ROUTES.CHECKOUT}>
                           Pagar <i className="fa fa-arrow-circle-right"></i>
                         </Link>
                       </div>

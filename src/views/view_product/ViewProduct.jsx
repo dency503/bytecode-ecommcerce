@@ -4,6 +4,7 @@ import axios from "axios";
 import api from "../../utils/apiConfig";
 import { useUserCart } from "../../hooks/UserCartProvider";
 import useDocumentTitle from "../../hooks/useDocumentTitle";
+import PaymentComponent from "../PaymentComponent";
 
 const ViewProduct = () => {
   const { id } = useParams();
@@ -46,7 +47,7 @@ const ViewProduct = () => {
 
   const addToCart = async () => {
     try {
-      const response = await api.post(`/carrito/${id}`);
+      const response = await api.post(`/carrito/${id}/1`);
       setNuevaCantidad(1);
       fetchData();
     } catch (error) {
@@ -110,7 +111,7 @@ const ViewProduct = () => {
   }
 
   const isProductInCart = nuevaCantidad > 0;
-  const isProductSoldOut = !producto.disponibilidad;
+  const isProductSoldOut = !producto.stock;
 
   return (
     <div className="container mt-5">
@@ -127,7 +128,7 @@ const ViewProduct = () => {
           <p className="lead">Precio: ${producto.precio}</p>
           <p><strong>Descripción:</strong> {producto.descripcionProducto}</p>
           <p><strong>Características:</strong> {producto.caracteristicas}</p>
-          <p><strong>Disponibilidad:</strong> {producto.disponibilidad ? "En stock" : "Agotado"}</p>
+          <p><strong>Disponibilidad:</strong> {producto.stock ? "En stock" : "Agotado"}</p>
           <p><strong>Categoría:</strong> {producto.categoria.nombreCategoria}</p>
 
           {isProductInCart ? (
@@ -168,7 +169,7 @@ const ViewProduct = () => {
             onClick={() => navigate("/")}
             text="Volver a la Tienda"
             btnClass="btn-secondary mt-3"
-          />
+          /><PaymentComponent/>
         </div>
       </div>
     </div>
