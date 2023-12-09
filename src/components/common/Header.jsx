@@ -26,15 +26,15 @@ const Header = () => {
       if (response.status === 200) {
         // La eliminación fue exitosa, realizar acciones adicionales si es necesario
         fetchData();
-        console.log("Elemento eliminado del carrito con éxito.");
+        toast("Elemento eliminado del carrito con éxito.");
         // Realizar otras acciones después de la eliminación si es necesario
       } else {
         // La eliminación no fue exitosa, manejar el error si es necesario
-        console.error("Error al eliminar el elemento del carrito.");
+        toast.error("Error al eliminar el elemento del carrito.");
       }
     } catch (error) {
       // Error de red u otro error, manejar el error si es necesario
-      console.error(
+      toast.error(
         "Error de red al intentar eliminar el elemento del carrito.",
         error
       );

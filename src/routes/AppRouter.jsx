@@ -34,6 +34,8 @@ import GestionarCliente from "../views/admin/GestionarClientes";
 import GestionarVenta from "../views/admin/GestionarVenta";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
+// En tu componente o archivo principal
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 // Import AboutUs if it exists
 // import AboutUs from "@/views/AboutUs";

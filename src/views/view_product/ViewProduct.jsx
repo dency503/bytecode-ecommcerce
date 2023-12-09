@@ -5,6 +5,7 @@ import api from "../../utils/apiConfig";
 import { useUserCart } from "../../hooks/UserCartProvider";
 import useDocumentTitle from "../../hooks/useDocumentTitle";
 import PaymentComponent from "../PaymentComponent";
+import { toast } from "react-toastify";
 
 const ViewProduct = () => {
   const { id } = useParams();
@@ -12,55 +13,67 @@ const ViewProduct = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const { fetchData } = useUserCart();
+  const [cantidad, setCantidad] = useState(null);
   const [nuevaCantidad, setNuevaCantidad] = useState(null);
   const [itemId, setItemId] = useState(null);
-
+  const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
   useDocumentTitle(`${producto?.nombreProducto || ""} | Bytecode`);
 
   useEffect(() => {
     const fetchProductDetails = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/api/productos/${id}`);
+        const response = await axios.get(`${apiUrl}/productos/${id}`);
         setProducto(response.data);
       } catch (error) {
-        console.error("Error al obtener detalles del producto:", error);
+        toast.error("Error al obtener detalles del producto:", error);
         setError("No se pudo cargar el producto.");
       }
     };
-
+   
     fetchProductDetails();
   }, [id]);
-
   useEffect(() => {
+    
+    nuevaCantidad !=null?modifyToCart():"";
+  }, [id,nuevaCantidad]);
+  useEffect(() => {
+    
     const fetchCartItem = async () => {
       try {
-        const response = await api.get(`/carrito/item/producto/${id}`);
+        const response = await api.get(`/carrito/item/${id}`);
         setNuevaCantidad(response.data.cantidad);
         setItemId(response.data.itemId);
       } catch (error) {
-        console.error("Error al obtener detalles del producto en el carrito:", error);
+        
       }
     };
-
-    fetchCartItem();
+    const token = localStorage.getItem("token");
+    if (token) {
+      fetchCartItem();
+    } else {
+      // Lógica para manejar la ausencia de token, si es necesario
+     
+    }
+    
   }, [id]);
+  const modifyToCart = async () => {
+    try {
+      await api.put(`/carrito/${id}/${nuevaCantidad}`);
+      fetchData();
+      toast.success("has cambiado la cantidad");
+    } catch (error) {
+      toast.error("Error al modificar el carrito:", error);
+    }
+  };
 
   const addToCart = async () => {
     try {
       const response = await api.post(`/carrito/${id}/1`);
       setNuevaCantidad(1);
       fetchData();
+      toast.success("Producto agregado");
     } catch (error) {
       console.error("Error al agregar el producto al carrito:", error);
-    }
-  };
-
-  const modifyToCart = async () => {
-    try {
-      await api.put(`/carrito/item/${itemId}?nuevaCantidad=${nuevaCantidad}`);
-      fetchData();
-    } catch (error) {
-      console.error("Error al modificar el carrito:", error);
     }
   };
 
@@ -79,6 +92,9 @@ const ViewProduct = () => {
     if (!isNaN(nuevaCantidad) && nuevaCantidad >= 1) {
       setNuevaCantidad(nuevaCantidad);
     }
+    if (nuevaCantidad !== null) {
+      modifyToCart();
+    }
   };
 
   const deleteFromCart = async () => {
@@ -87,14 +103,14 @@ const ViewProduct = () => {
         const response = await api.delete(`/carrito/item/${itemId}`);
         if (response.status === 200) {
           fetchData();
-          console.log("Elemento eliminado del carrito con éxito.");
+          toast.log("Elemento eliminado del carrito con éxito.");
           setNuevaCantidad(0);
           setItemId(null);
         } else {
-          console.error("Error al eliminar el elemento del carrito.");
+          toast.error("Error al eliminar el elemento del carrito.");
         }
       } catch (error) {
-        console.error(
+        toast.error(
           "Error de red al intentar eliminar el elemento del carrito.",
           error
         );
@@ -126,15 +142,27 @@ const ViewProduct = () => {
         <div className="col-md-6">
           <h1 className="display-4">{producto.nombreProducto}</h1>
           <p className="lead">Precio: ${producto.precio}</p>
-          <p><strong>Descripción:</strong> {producto.descripcionProducto}</p>
-          <p><strong>Características:</strong> {producto.caracteristicas}</p>
-          <p><strong>Disponibilidad:</strong> {producto.stock ? "En stock" : "Agotado"}</p>
-          <p><strong>Categoría:</strong> {producto.categoria.nombreCategoria}</p>
+          <p>
+            <strong>Descripción:</strong> {producto.descripcionProducto}
+          </p>
+          <p>
+            <strong>Características:</strong> {producto.caracteristicas}
+          </p>
+          <p>
+            <strong>Disponibilidad:</strong>{" "}
+            {producto.stock ? "En stock" : "Agotado"}
+          </p>
+          <p>
+            <strong>Categoría:</strong> {producto.categoria.nombreCategoria}
+          </p>
 
           {isProductInCart ? (
             <div className="d-flex align-items-center mt-3">
               {isProductSoldOut ? (
-                <button className="btn btn-danger" onClick={() => deleteFromCart(itemId)}>
+                <button
+                  className="btn btn-danger"
+                  onClick={() => deleteFromCart(itemId)}
+                >
                   <i className="fa fa-trash"></i>
                 </button>
               ) : (
@@ -160,7 +188,9 @@ const ViewProduct = () => {
             <ActionButton
               onClick={addToCart}
               text="Agregar al Carrito"
-              btnClass={`btn-primary mt-3 ${isProductSoldOut ? "disabled" : ""}`}
+              btnClass={`btn-primary mt-3 ${
+                isProductSoldOut ? "disabled" : ""
+              }`}
               disabled={isProductSoldOut}
             />
           )}
@@ -169,14 +199,21 @@ const ViewProduct = () => {
             onClick={() => navigate("/")}
             text="Volver a la Tienda"
             btnClass="btn-secondary mt-3"
-          /><PaymentComponent/>
+          />
+          <PaymentComponent />
         </div>
       </div>
     </div>
   );
 };
 
-const ActionButton = ({ onClick, iconClass, text, btnClass = "btn-primary", disabled = false }) => (
+const ActionButton = ({
+  onClick,
+  iconClass,
+  text,
+  btnClass = "btn-primary",
+  disabled = false,
+}) => (
   <button
     className={`btn ${btnClass} mt-3`}
     onClick={onClick}

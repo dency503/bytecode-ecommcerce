@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { useNavigate, Link } from 'react-router-dom'; // Import Link
-import { useUserCart } from '../../../hooks/UserCartProvider';
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate, Link } from "react-router-dom"; // Import Link
+import { useUserCart } from "../../../hooks/UserCartProvider";
 
 const SignInForm = () => {
+  const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
   const { fetchData } = useUserCart();
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   });
 
   const navigate = useNavigate();
@@ -22,30 +23,29 @@ const SignInForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        'http://localhost:8080/api/v1/auth/signin',
-        formData,
-        {
-          withCredentials: true,
-        }
-      );
+      const response = await axios.post(`${apiUrl}/v1/auth/signin`, formData, {
+        withCredentials: true,
+      });
       const token = response.data.token;
-      localStorage.setItem('token', token);
+      localStorage.setItem("token", token);
       fetchData();
-      navigate('/'); // Redirect to the home page after successful login
+      navigate("/"); // Redirect to the home page after successful login
     } catch (error) {
-      console.error('Error al enviar la solicitud:', error);
+      console.error("Error al enviar la solicitud:", error);
     }
   };
 
   return (
     <div className="container mt-5">
-      <div className="row justify-content-center align-items-center" style={{ minHeight: '50vh' }}>
+      <div
+        className="row justify-content-center align-items-center"
+        style={{ minHeight: "50vh" }}
+      >
         <div className="col-md-6">
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
               <label htmlFor="email" className="form-label">
-              <i className="fas fa-envelope" aria-hidden="true"></i> Email
+                <i className="fas fa-envelope" aria-hidden="true"></i> Email
               </label>
               <input
                 type="email"
@@ -61,7 +61,7 @@ const SignInForm = () => {
             </div>
             <div className="mb-3">
               <label htmlFor="password" className="form-label">
-              <i className="fas fa-lock" aria-hidden="true"></i> Password
+                <i className="fas fa-lock" aria-hidden="true"></i> Password
               </label>
               <input
                 type="password"
@@ -81,8 +81,7 @@ const SignInForm = () => {
           </form>
           <div className="mt-3">
             <p>
-              ¿No tienes una cuenta?{' '}
-              <Link to="/signup">Regístrate aquí</Link>.
+              ¿No tienes una cuenta? <Link to="/signup">Regístrate aquí</Link>.
             </p>
           </div>
         </div>

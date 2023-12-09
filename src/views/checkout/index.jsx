@@ -2,23 +2,19 @@ import React, { useState, useEffect } from "react";
 import { useUserCart } from "../../hooks/UserCartProvider";
 import api from "../../utils/apiConfig";
 import "react-toastify/dist/ReactToastify.css";
-import {
-  CardElement,
-
-  useElements,
-  useStripe,
-} from "@stripe/react-stripe-js";
+import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 
 import { Button } from "react-bootstrap";
 import { ToastContainer, toast } from "react-toastify";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import useDocumentTitle from "../../hooks/useDocumentTitle";
 const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 
 const CheckOut = () => {
   const { cart } = useUserCart();
-  const navigate =useNavigate();
-
+  const navigate = useNavigate();
+  useDocumentTitle("CheckOut | ByteCode");
   const [cardComplete, setCardComplete] = useState(false);
 
   const stripe = useStripe();
@@ -26,8 +22,6 @@ const CheckOut = () => {
   const handleCardChange = (event) => {
     // Puedes realizar validaciones adicionales aquí según tus necesidades
     setCardComplete(event.complete);
-
-    
   };
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -38,7 +32,7 @@ const CheckOut = () => {
       const { token } = await stripe.createToken(cardElement);
 
       // Handle the token (e.g., send it to your server for payment processing)
-  
+
       const orderDescription = cart.items
         ? cart.items
             .map(
@@ -52,7 +46,6 @@ const CheckOut = () => {
       // Example with createPaymentMethod:
       const { data } = await axios.post(`${apiUrl}/payment/create`, {
         paymentMethodId: token.id,
-    
 
         description: orderDescription,
         amount:
@@ -67,31 +60,28 @@ const CheckOut = () => {
       });
 
       // Once you have the clientSecret, you can use it to confirm the payment
-     const  result = await stripe.confirmCardPayment(
-        data.client_secret,
-        {
-          payment_method: {
-            card: cardElement,billing_details: {
-              name: client.nombreCliente + " "+ client.apellidoCliente,
-              email: client.email,
-              phone: client.telefono,
-              address: {
-                city: client.direccion.distrito.distrito,
-                country: "SV",
-                line1:  client.direccion.line1,
-                
-                postal_code:  client.direccion.codigoPostal,
-                state: client.direccion.distrito.municipio.departamento.departamento,
-                
-              },
+      const result = await stripe.confirmCardPayment(data.client_secret, {
+        payment_method: {
+          card: cardElement,
+          billing_details: {
+            name: client.nombreCliente + " " + client.apellidoCliente,
+            email: client.email,
+            phone: client.telefono,
+            address: {
+              city: client.direccion.distrito.distrito,
+              country: "SV",
+              line1: client.direccion.line1,
+
+              postal_code: client.direccion.codigoPostal,
+              state:
+                client.direccion.distrito.municipio.departamento.departamento,
             },
           },
-        }
-        
-      );
-       await axios.post(`${apiUrl}/payment/sucesss`, {
+        },
+      });
+      await axios.post(`${apiUrl}/payment/sucesss`, {
         paymentIntentId: result.paymentIntent.id,
-        carritoId: cart.carritoId
+        carritoId: cart.carritoId,
       });
       toast.success("Pago Realizado", {
         onClose: () => {
@@ -113,7 +103,6 @@ const CheckOut = () => {
       .then((response) => {
         // Establecer el nombre en el estado usando los datos de la respuesta
         setClient(response.data);
-        
       })
       .catch((error) => {
         console.error("Error al obtener productos:", error);
@@ -180,7 +169,7 @@ const CheckOut = () => {
                     value={client.direccion && client.direccion.linea1}
                   />
                 </div>
-                
+
                 <div className="form-group">
                   <input
                     className="input"
@@ -196,7 +185,8 @@ const CheckOut = () => {
                 </div>
                 <div className="form-group">
                   <input
-                    className="input"codigoPostal
+                    className="input"
+                    codigoPostal
                     type="text"
                     name="country"
                     value={client.direccion && client.direccion.pais}
@@ -221,10 +211,7 @@ const CheckOut = () => {
                     readOnly
                   />
                 </div>
-                
               </div>
-
-             
 
               <div className="order-notes">
                 <textarea

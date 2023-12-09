@@ -109,7 +109,7 @@ const GestionarCargo = () => {
         </thead>
         <tbody>
           {cargos.map((cargo) => (
-            <tr key={cargo.id}>
+            <tr key={cargo.cargoId}>
               <td>{cargo.cargoId}</td>
               <td>{cargo.nombreCargo}</td>
 

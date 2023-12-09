@@ -10,6 +10,7 @@ const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 
 const GestionarEmpleado = () => {
   useDocumentTitle("Empleados | Admin Bytecode");
+  const [loading, setLoading] = useState(true);
   const [empleados, setEmpleados] = useState([]);
   const [empleadoSeleccionado, setEmpleadoSeleccionado] = useState(null);
   const [show, setShow] = useState(false);

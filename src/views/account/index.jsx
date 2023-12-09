@@ -4,11 +4,24 @@ import axios from "axios";
 import api from "../../utils/apiConfig";
 import useDocumentTitle from "../../hooks/useDocumentTitle";
 import useScrollTop from "../../hooks/useScrollTop";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import HistorialComprasTab from "./HistorialComprasTab";
+import {
+  faCheckCircle,
+  faTimesCircle,
+} from "@fortawesome/free-solid-svg-icons";
+import {
+  faCalendarAlt,
+  faMoneyBillWave,
+  faCreditCard,
+  faUser,
+} from "@fortawesome/free-solid-svg-icons";
+import DireccionEnvioTab from "./DireccionEnvioTab"
 const Account = () => {
   useDocumentTitle("Cuenta | ByteCode");
   const [showPersonalEditModal, setShowPersonalEditModal] = useState(false);
   const [showAddressEditModal, setShowAddressEditModal] = useState(false);
+
   useScrollTop();
   const [client, setClient] = useState({});
   const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
@@ -49,6 +62,7 @@ const Account = () => {
   const handleEditClick = () => {
     setShowEditModal(true);
   };
+ 
 
   useEffect(() => {
     // Hacer una solicitud GET a la API para obtener el nombre
@@ -109,40 +123,10 @@ const Account = () => {
               </div>
             </Tab>
             <Tab eventKey="direccion" title="Dirección de Envío">
-              {address && (
-                <div className="card mt-3">
-                  <div className="card-body">
-                    <h4 className="card-title">Dirección de Envío</h4>
-                    <p className="card-text">
-                      <strong>Linea 1:</strong> {address?.linea1}
-                    </p>
-                    <p className="card-text">
-                      <strong>Distrito:</strong> {address.distrito?.distrito}
-                    </p>
-                    <p className="card-text">
-                      <strong>Municipio:</strong>{" "}
-                      {address.distrito?.municipio.municipio}
-                    </p>
-                    <p className="card-text">
-                      <strong>Departamento:</strong>{" "}
-                      {address.distrito?.municipio.departamento.departamento}
-                    </p>
-                    <p className="card-text">
-                      <strong>Código Postal:</strong> {address.codigoPostal}
-                    </p>
-                    <Button
-                      variant="primary"
-                      onClick={() => setShowAddressEditModal(true)}
-                    >
-                      Editar
-                    </Button>
-                  </div>
-                </div>
-              )}
+              <DireccionEnvioTab address={address} />
             </Tab>
             <Tab eventKey="compras" title="Historial de Compras">
-              {/* Contenido de la pestaña de historial de compras */}
-              {/* Aquí puedes mostrar la información de historial de compras */}
+              <HistorialComprasTab />
             </Tab>
           </Tabs>
 

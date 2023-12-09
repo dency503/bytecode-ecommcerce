@@ -34,7 +34,7 @@ const PrivateRoute = ({ isAuth, component: Component }) => {
       // Redirect to admin dashboard for users with 'ADMIN' role
       navigate(ROUTES.ADMIN_DASHBOARD);
     }
-  }, [isAuth, navigate]);
+  }, [ navigate]);
 
   // If the user is authenticated and not an admin, render the component
   return  (
@@ -44,12 +44,10 @@ const PrivateRoute = ({ isAuth, component: Component }) => {
   ) ;
 };
 
-PrivateRoute.defaultProps = {
-  isAuth: false,
-};
+
 
 PrivateRoute.propTypes = {
-  isAuth: PropTypes.bool,
+
   component: PropTypes.func.isRequired,
 };
 

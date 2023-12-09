@@ -72,6 +72,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 a {
+  text-decoration: none;
   color: #2B2D42;
   font-weight: 500;
   transition: 0.2s color; /* Removed -webkit- prefix for better compatibility */

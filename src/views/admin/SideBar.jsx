@@ -15,37 +15,37 @@ const Sidebar = () => {
           Admin Panel
         </Navbar.Brand>
         <Nav className="flex-column">
-          <NavLink exact to={ROUTES.ADMIN_DASHBOARD} className="nav-link text-light" activeClassName="active">
+          <NavLink  to={ROUTES.ADMIN_DASHBOARD} className="nav-link text-light" activeclassname="active">
             <FontAwesomeIcon icon={faChartBar} /> Dashboard
           </NavLink>
-          <NavLink to={ROUTES.ADMIN_PRODUCTO} className="nav-link text-light" activeClassName="active">
+          <NavLink to={ROUTES.ADMIN_PRODUCTO} className="nav-link text-light" activeclassname="active">
             <FontAwesomeIcon icon={faCube} /> Gestionar Productos
           </NavLink>
-          <NavLink to={ROUTES.ADMIN_CARGOS} className="nav-link text-light" activeClassName="active">
+          <NavLink to={ROUTES.ADMIN_CARGOS} className="nav-link text-light" activeclassname="active">
             <FontAwesomeIcon icon={faBriefcase} /> Cargo
           </NavLink>
-          <NavLink to={ROUTES.ADMIN_CLIENTES} className="nav-link text-light" activeClassName="active">
+          <NavLink to={ROUTES.ADMIN_CLIENTES} className="nav-link text-light" activeclassname="active">
             <FontAwesomeIcon icon={faList} /> Clientes
           </NavLink>
-          <NavLink to={ROUTES.ADMIN_CATEGORIAS} className="nav-link text-light" activeClassName="active">
+          <NavLink to={ROUTES.ADMIN_CATEGORIAS} className="nav-link text-light" activeclassname="active">
             <FontAwesomeIcon icon={faSitemap} /> Categoría
           </NavLink>
-          <NavLink to={ROUTES.ADMIN_EMPLEADOS} className="nav-link text-light" activeClassName="active">
+          <NavLink to={ROUTES.ADMIN_EMPLEADOS} className="nav-link text-light" activeclassname="active">
             <FontAwesomeIcon icon={faUser} /> Empleado
           </NavLink>
-          <NavLink to={ROUTES.ADMIN_MARCAS} className="nav-link text-light" activeClassName="active">
+          <NavLink to={ROUTES.ADMIN_MARCAS} className="nav-link text-light" activeclassname="active">
             <FontAwesomeIcon icon={faTags} /> Marca
           </NavLink>
-          <NavLink to={ROUTES.ADMIN_PROVEEDORES} className="nav-link text-light" activeClassName="active">
+          <NavLink to={ROUTES.ADMIN_PROVEEDORES} className="nav-link text-light" activeclassname="active">
             <FontAwesomeIcon icon={faTruck} /> Proveedores
           </NavLink>
-          <NavLink to={ROUTES.ADMIN_VENTAS} className="nav-link text-light" activeClassName="active">
+          <NavLink to={ROUTES.ADMIN_VENTAS} className="nav-link text-light" activeclassname="active">
           <FontAwesomeIcon icon={faMoneyBillWave} /> Ventas
         </NavLink>
           {/* Enlace externo a YouTube */}
-          <NavLink to="https://www.youtube.com/watch?v=dQw4w9WgXcQ" className="nav-link text-light" target="_blank" rel="noopener noreferrer">
-        Configuración
-      </NavLink>
+          <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" className="nav-link text-light" target="_blank" rel="noopener noreferrer">
+          Configuración
+        </a>
         </Nav>
       </Col>
     );
