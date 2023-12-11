@@ -3,21 +3,33 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import api from "../../utils/apiConfig";
 import { useUserCart } from "../../hooks/UserCartProvider";
-import useDocumentTitle from "../../hooks/useDocumentTitle";
+import { useDocumentTitle, useBasket } from "@/hooks";
 import PaymentComponent from "../PaymentComponent";
 import { toast } from "react-toastify";
-
+import { useDispatch, useSelector } from "react-redux";
+import { addQtyItem, minusQtyItem } from "@/redux/actions/basketActions";
 const ViewProduct = () => {
   const { id } = useParams();
+  const { addToBasket, isItemOnBasket } = useBasket(id);
   const [producto, setProducto] = useState(null);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const { fetchData } = useUserCart();
-  const [cantidad, setCantidad] = useState(null);
+
   const [nuevaCantidad, setNuevaCantidad] = useState(null);
   const [itemId, setItemId] = useState(null);
   const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
   useDocumentTitle(`${producto?.nombreProducto || ""} | Bytecode`);
+  const product = useSelector((state) => {
+    const foundProduct = state.basket.find(
+      (product) => product.productoId == id
+    );
+
+    return foundProduct || null; // Devuelve null si el producto no se encuentra
+  });
+  const handleAddToBasket = () => {
+    addToBasket({ ...producto, quantity: 1 });
+  };
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -29,62 +41,25 @@ const ViewProduct = () => {
         setError("No se pudo cargar el producto.");
       }
     };
-   
+
     fetchProductDetails();
   }, [id]);
-  useEffect(() => {
-    
-    nuevaCantidad !=null?modifyToCart():"";
-  }, [id,nuevaCantidad]);
-  useEffect(() => {
-    
-    const fetchCartItem = async () => {
-      try {
-        const response = await api.get(`/carrito/item/${id}`);
-        setNuevaCantidad(response.data.cantidad);
-        setItemId(response.data.itemId);
-      } catch (error) {
-        
-      }
-    };
-    const token = localStorage.getItem("token");
-    if (token) {
-      fetchCartItem();
-    } else {
-      // Lógica para manejar la ausencia de token, si es necesario
-     
-    }
-    
-  }, [id]);
-  const modifyToCart = async () => {
-    try {
-      await api.put(`/carrito/${id}/${nuevaCantidad}`);
-      fetchData();
-      toast.success("has cambiado la cantidad");
-    } catch (error) {
-      toast.error("Error al modificar el carrito:", error);
-    }
-  };
-
+  const dispatch = useDispatch();
   const addToCart = async () => {
-    try {
-      const response = await api.post(`/carrito/${id}/1`);
-      setNuevaCantidad(1);
-      fetchData();
-      toast.success("Producto agregado");
-    } catch (error) {
-      console.error("Error al agregar el producto al carrito:", error);
-    }
+    addToBasket({ ...producto, quantity: 1 });
+   
   };
 
   const handleDecrease = () => {
-    if (nuevaCantidad > 1) {
-      setNuevaCantidad(nuevaCantidad - 1);
+    if (product.stock >= product.quantity && product.quantity !== 0) {
+      dispatch(minusQtyItem(product.productoId));
     }
   };
 
   const handleIncrease = () => {
-    setNuevaCantidad(nuevaCantidad + 1);
+    if (product.quantity < product.stock) {
+      dispatch(addQtyItem(product.productoId));
+    }
   };
 
   const handleInputChange = (event) => {
@@ -94,27 +69,6 @@ const ViewProduct = () => {
     }
     if (nuevaCantidad !== null) {
       modifyToCart();
-    }
-  };
-
-  const deleteFromCart = async () => {
-    if (itemId) {
-      try {
-        const response = await api.delete(`/carrito/item/${itemId}`);
-        if (response.status === 200) {
-          fetchData();
-          toast.log("Elemento eliminado del carrito con éxito.");
-          setNuevaCantidad(0);
-          setItemId(null);
-        } else {
-          toast.error("Error al eliminar el elemento del carrito.");
-        }
-      } catch (error) {
-        toast.error(
-          "Error de red al intentar eliminar el elemento del carrito.",
-          error
-        );
-      }
     }
   };
 
@@ -156,7 +110,7 @@ const ViewProduct = () => {
             <strong>Categoría:</strong> {producto.categoria.nombreCategoria}
           </p>
 
-          {isProductInCart ? (
+          {product ? (
             <div className="d-flex align-items-center mt-3">
               {isProductSoldOut ? (
                 <button
@@ -173,7 +127,7 @@ const ViewProduct = () => {
                   <input
                     type="number"
                     className="form-control mx-2"
-                    value={nuevaCantidad}
+                    value={product.quantity}
                     onChange={handleInputChange}
                     min="1"
                     style={{ maxWidth: "70px" }}
@@ -200,7 +154,6 @@ const ViewProduct = () => {
             text="Volver a la Tienda"
             btnClass="btn-secondary mt-3"
           />
-          <PaymentComponent />
         </div>
       </div>
     </div>

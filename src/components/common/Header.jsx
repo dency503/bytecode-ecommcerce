@@ -4,8 +4,12 @@ import api from "../../utils/apiConfig";
 import { useUserCart } from "../../hooks/UserCartProvider";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import * as ROUTES from '@/constants/routes';
+import * as ROUTES from "@/constants/routes";
+import { useSelector } from "react-redux";
+import CartButton from "../basket/CartButton";
+
 const Header = () => {
+  const user = useSelector((state) => state.profile);
   const { name, cart, fetchData } = useUserCart();
   const [categorias, setCategorias] = useState([]);
   const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
@@ -47,7 +51,6 @@ const Header = () => {
       fetchData();
     } else {
       // Lógica para manejar la ausencia de token, si es necesario
-
     }
 
     // Hacer la solicitud GET usando Axios
@@ -86,9 +89,9 @@ const Header = () => {
               </a>
             </li>
             <li>
-              {name ? (
+              {user.nombreCliente ? (
                 <a href="/cuenta">
-                  <i className="fa fa-user-o"></i> {name}
+                  <i className="fa fa-user-o"></i> {user.nombreCliente}
                 </a>
               ) : (
                 <a href="/signin">
@@ -148,6 +151,9 @@ const Header = () => {
                     </div>*/}
 
                 <div className="dropdown">
+                  <a>
+                    <CartButton />
+                  </a>
                   <a
                     className="nav-link dropdown-toggle"
                     href="#"
@@ -208,7 +214,7 @@ const Header = () => {
                         </h5>
                       </div>
                       <div className="cart-btns">
-                        <Link className="dropdown-item" to= {ROUTES.CHECKOUT}>
+                        <Link className="dropdown-item" to={ROUTES.CHECKOUT}>
                           Pagar <i className="fa fa-arrow-circle-right"></i>
                         </Link>
                       </div>

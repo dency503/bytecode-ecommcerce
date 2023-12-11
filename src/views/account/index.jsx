@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Modal, Tab, Tabs } from "react-bootstrap";
+import { Button, Modal, Tab, Tabs} from "react-bootstrap";
 import axios from "axios";
 import api from "../../utils/apiConfig";
 import useDocumentTitle from "../../hooks/useDocumentTitle";
@@ -16,76 +16,55 @@ import {
   faCreditCard,
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
-import DireccionEnvioTab from "./DireccionEnvioTab"
+import DireccionEnvioTab from "./DireccionEnvioTab";
+import { ErrorMessage, Field, Form, Formik, useFormik } from "formik";
+import * as Yup from "yup";
+import { useDispatch, useSelector } from "react-redux";
+import { updateProfile } from "@/redux/actions/profileActions";
+import { ToastContainer } from "react-toastify";
 const Account = () => {
   useDocumentTitle("Cuenta | ByteCode");
-  const [showPersonalEditModal, setShowPersonalEditModal] = useState(false);
-  const [showAddressEditModal, setShowAddressEditModal] = useState(false);
 
+  const client = useSelector((state) => state.profile);
+  const address = useSelector((state) => state.profile.direccion);
   useScrollTop();
-  const [client, setClient] = useState({});
+  const initialValues = {
+    nombreCliente: (client && client.nombreCliente) || "",
+    apellidoCliente: (client && client.apellidoCliente) || "",
+    email: (client && client.email) || "",
+    telefono: (client && client.telefono) || "",
+    // Otros campos de usuario
+  };
+  const formik = Yup.object({
+    nombreCliente: Yup.string().required("El nombre es obligatorio"),
+    apellidoCliente: Yup.string().required("El apellido es obligatorio"),
+    email: Yup.string().email("Correo electrónico no válido"),
+    telefono: Yup.string().matches(/^\d+$/, "Solo números permitidos"),
+    // Agrega validaciones para otros campos según sea necesario
+  });
+
   const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
   const [key, setKey] = useState("personal");
-  const [address, setAddress] = useState({});
-  const [departamentos, setDepartamentos] = useState([]);
-  const [selectedDepartamentoId, setSelectedDepartamentoId] = useState("");
-  const [municipios, setMunicipios] = useState([]);
-  const [usuario, setUsuario] = useState({
-    nombre: "",
-    apellido: "",
-    email: "",
-    pais: "",
-    telefono: "",
-    direccion: "",
-  });
-  const handleSaveChanges = () => {};
-  const handleSaveAddressChanges = () => {
-    // Lógica para guardar los cambios en la dirección
-    // Puedes utilizar una solicitud PUT a tu API para actualizar la dirección
-    setShowAddressEditModal(false);
-  };
+
   const [showEditModal, setShowEditModal] = useState(false);
-  useEffect(() => {
-    // ... Código previo ...
-    console.log(address.departamentoId);
-    if (address.departamentoId !== "") {
-      axios
-        .get(`${apiUrl}/municipios/departamento/${address.departamentoId}`)
-        .then((response) => {
-          setMunicipios(response.data.content);
-        })
-        .catch((error) => {
-          console.error("Error al obtener la lista de municipios:", error);
-        });
-    }
-  }, [address.departamentoId]);
+  const dispatch = useDispatch();
   const handleEditClick = () => {
     setShowEditModal(true);
   };
- 
-
-  useEffect(() => {
-    // Hacer una solicitud GET a la API para obtener el nombre
-    api
-      .get("/v1/auth/user")
-      .then((response) => {
-        // Establecer el nombre en el estado usando los datos de la respuesta
-        setClient(response.data);
-        setAddress(response.data.direccion);
+  const onSubmitForm = (values) => {
+    dispatch(
+      updateProfile({
+        updates: {
+          nombreCliente: values.nombreCliente,
+          apellidoCliente: values.apellidoCliente,
+          email: values.email,
+          telefono: values.telefono,
+        },
       })
-      .catch((error) => {
-        console.error("Error al obtener productos:", error);
-      });
+    );
+    setShowEditModal(false);
+  };
 
-    axios
-      .get(`${apiUrl}/departamentos`)
-      .then((response) => {
-        setDepartamentos(response.data.content);
-      })
-      .catch((error) => {
-        console.error("Error al obtener la lista de departamentos:", error);
-      });
-  }, [localStorage.getItem("token")]);
   return (
     <div className="container section mt-5">
       <div className="row">
@@ -136,155 +115,87 @@ const Account = () => {
               <Modal.Title>Editar Información</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              {/* Contenido del formulario para editar la información */}
-              <form>
-                <div className="form-group">
-                  <label htmlFor="nombre">Nombre</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="nombre"
-                    value={client.nombreCliente}
-                    onChange={(e) =>
-                      setClient({ ...client, nombreCliente: e.target.value })
-                    }
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="apellido">Apellido</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="apellido"
-                    value={client.apellidoCliente}
-                    onChange={(e) =>
-                      setClient({ ...client, apellidoCliente: e.target.value })
-                    }
-                  />
-                </div>
-                {/* Otros campos de usuario */}
-              </form>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button
-                variant="secondary"
-                onClick={() => setShowEditModal(false)}
+              <Formik
+                initialValues={initialValues}
+                validateOnChange
+                validationSchema={formik}
+                onSubmit={onSubmitForm}
               >
-                Cerrar
-              </Button>
-              <Button variant="primary" onClick={handleSaveChanges}>
-                Guardar Cambios
-              </Button>
-            </Modal.Footer>
-          </Modal>
-
-          <Modal
-            show={showAddressEditModal}
-            onHide={() => setShowAddressEditModal(false)}
-          >
-            <Modal.Header closeButton>
-              <Modal.Title>Editar Dirección de Envío</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <form>
-                <div className="form-group">
-                  <label htmlFor="departamento">Departamento</label>
-                  <select
-                    className="form-control"
-                    id="departamento"
-                    value={address.departamentoId}
-                    onChange={(e) => {
-                      setAddress((prevAddress) => ({
-                        ...prevAddress,
-                        departamentoId: e.target.value,
-                      }));
-                    }}
-                  >
-                    <option value="">Selecciona un departamento</option>
-                    {departamentos.map((departamento) => (
-                      <option
-                        key={departamento.idDepartamento}
-                        value={departamento.idDepartamento}
+                {() => (
+                  <Form>
+                    <div className="form-group">
+                      <label htmlFor="nombreCliente">Nombre</label>
+                      <Field
+                        type="text"
+                        id="nombreCliente"
+                        name="nombreCliente"
+                        className="form-control"
+                      />
+                      <ErrorMessage
+                        name="nombreCliente"
+                        component="div"
+                        className="error"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="apellidoCliente">Apellido</label>
+                      <Field
+                        type="text"
+                        id="apellidoCliente"
+                        name="apellidoCliente"
+                        className="form-control"
+                      />
+                      <ErrorMessage
+                        name="apellidoCliente"
+                        component="div"
+                        className="error"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="email">Correo Electrónico</label>
+                      <Field
+                        type="text"
+                        id="email"
+                        readOnly
+                        name="email"
+                        className="form-control"
+                      />
+                      <ErrorMessage
+                        name="email"
+                        component="div"
+                        className="error"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="telefono">Número de Teléfono</label>
+                      <Field
+                        type="text"
+                        id="telefono"
+                        name="telefono"
+                        className="form-control"
+                      />
+                      <ErrorMessage
+                        name="telefono"
+                        component="div"
+                        className="error"
+                      />
+                    </div>
+                    {/* Add other fields as needed */}
+                    <Modal.Footer>
+                      <Button
+                        variant="secondary"
+                        onClick={() => setShowEditModal(false)}
                       >
-                        {departamento.departamento}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label htmlFor="municipio">Municipio</label>
-                  <select
-                    className="form-control"
-                    id="municipio"
-                    value={address.municipioId}
-                    onChange={(e) =>
-                      setAddress({ ...address, municipioId: e.target.value })
-                    }
-                  >
-                    <option value="">Selecciona un municipio</option>
-                    {municipios.map((municipio) => (
-                      <option key={municipio.id} value={municipio.id}>
-                        {municipio.municipio}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label htmlFor="distrito">Distrito</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="distrito"
-                    value={address.distrito?.distrito}
-                    onChange={(e) =>
-                      setAddress({
-                        ...address,
-                        distrito: {
-                          ...address?.distrito,
-                          distrito: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="linea1">Línea 1</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="linea1"
-                    value={address.linea1}
-                    onChange={(e) =>
-                      setAddress({ ...address, linea1: e.target.value })
-                    }
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="codigoPostal">Código Postal</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="codigoPostal"
-                    value={address.codigoPostal}
-                    onChange={(e) =>
-                      setAddress({ ...address, codigoPostal: e.target.value })
-                    }
-                  />
-                </div>
-              </form>
+                        Cerrar
+                      </Button>
+                      <Button variant="primary" type="submit">
+                        Guardar Cambios
+                      </Button>
+                    </Modal.Footer>
+                  </Form>
+                )}
+              </Formik>
             </Modal.Body>
-            <Modal.Footer>
-              <Button
-                variant="secondary"
-                onClick={() => setShowAddressEditModal(false)}
-              >
-                Cerrar
-              </Button>
-              <Button variant="primary" onClick={handleSaveAddressChanges}>
-                Guardar Cambios
-              </Button>
-            </Modal.Footer>
           </Modal>
         </div>
       </div>

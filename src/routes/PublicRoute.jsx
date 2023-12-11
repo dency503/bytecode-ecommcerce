@@ -1,57 +1,49 @@
-import React, { useEffect } from 'react';
+/* eslint-disable react/forbid-prop-types */
+/* eslint-disable react/jsx-props-no-spreading */
 import PropTypes from 'prop-types';
-import { useNavigate } from 'react-router-dom';
-import jwtDecode from 'jwt-decode';  // Asegúrate de instalar la biblioteca jwt-decode
+import React, { useEffect } from 'react';
+import { connect } from 'react-redux';
+import { Navigate } from 'react-router-dom';
 
-import { SignInForm, SignUpForm } from '@/views';
-import * as ROUTES from '@/constants/routes';
-const PublicRoute = ({ isAuth, component: Component, path }) => {
-  const navigate = useNavigate();
 
-  useEffect(() => {
-    const token = localStorage.getItem('token');
+const PublicRoute = ({ isAuth, role, component: Component, path, ...rest }) => {
 
-    if (!token) {
-      // Si no hay token, redirige a la página de inicio de sesión
-      navigate(SignInForm);
-      return;
-    }
 
-    try {
-      // Decodifica el token para obtener la información, incluido el rol
-      const decodedToken = jwtDecode(token);
-     
-      if ( decodedToken.role === 'ADMIN') {
-        // Si es un administrador, redirige al panel de administrador
-        navigate(ROUTES.ADMIN_DASHBOARD);
-      } else if (( decodedToken.role === 'USER') && (path === "/signup" || path === "/signin")) {
-        // Si es un usuario y está intentando acceder a las páginas de inicio de sesión o registro, redirige a la página principal
-        console.log("token "+decodedToken.role)
-        navigate('/');
-      }
-    } catch (error) {
-      console.error('Error decoding JWT:', error);
-      // En caso de error al decodificar el token, maneja la situación según tus necesidades
-      navigate(SignInForm);  // Puedes redirigir a la página de inicio de sesión por precaución
-    }
-  }, [isAuth, path, navigate]);
+console.log(path)
+  if (isAuth && role === 'ADMIN') {
+    return <Navigate to="/admin/dashboard" />;
+  }
+
+  if ((isAuth && role === 'USER') && (path === '/signin' || path === '/signup')) {
+    return <Navigate to={"/"} />;
+  }
 
   return (
     <main className="content">
-      <Component />
+      <Component {...rest} />
     </main>
   );
 };
 
 PublicRoute.defaultProps = {
   isAuth: false,
-  path: '/'
+  role: 'USER',
+  path: '/',
 };
 
 PublicRoute.propTypes = {
   isAuth: PropTypes.bool,
-  component: PropTypes.elementType.isRequired,
+  role: PropTypes.string,
+  
   path: PropTypes.string,
+  
 };
 
-export default PublicRoute;
+const mapStateToProps = ({ auth }) => ({
+  isAuth: !!auth,
+  role: auth?.role || '',
+});
+
+
+
+export default connect(mapStateToProps)(PublicRoute);

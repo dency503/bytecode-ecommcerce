@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import ImagenLoader from "./ImagenLoader"
 const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 const Producto = ({ nombreCategoria, url_imagen,categoriaId}) => (
   <div className="col-md-4 col-xs-6">
     <Link to={`/categoria/${categoriaId}`} className="cta-btn">
       <div className="shop">
         <div className="shop-img">
-          <img src={url_imagen} alt={`Imagen de ${nombreCategoria}`}  style={{ maxWidth: "100%", maxHeight: "200px", objectFit: "cover" }} />
+          <ImagenLoader src={url_imagen} alt={`Imagen de ${nombreCategoria}`}  style={{ maxWidth: "100%", maxHeight: "200px", objectFit: "cover" }} />
         </div>
         <div className="shop-body">
           <h3>

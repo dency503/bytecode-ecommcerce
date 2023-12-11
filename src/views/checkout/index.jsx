@@ -9,19 +9,27 @@ import { ToastContainer, toast } from "react-toastify";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import useDocumentTitle from "../../hooks/useDocumentTitle";
+import { useSelector } from "react-redux";
 const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
-
+import { clearBasket } from "@/redux/actions/basketActions";
 const CheckOut = () => {
-  const { cart } = useUserCart();
   const navigate = useNavigate();
   useDocumentTitle("CheckOut | ByteCode");
-  const [cardComplete, setCardComplete] = useState(false);
 
+  const client = useSelector((state) => state.profile);
   const stripe = useStripe();
   const elements = useElements();
-  const handleCardChange = (event) => {
-    // Puedes realizar validaciones adicionales aquí según tus necesidades
-    setCardComplete(event.complete);
+
+  const cart = useSelector((state) => {
+    const foundProduct = state.basket;
+
+    return foundProduct || null; // Devuelve null si el producto no se encuentra
+  });
+
+  const onClearBasket = () => {
+    if (basket.length !== 0) {
+      dispatch(clearBasket());
+    }
   };
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -33,13 +41,13 @@ const CheckOut = () => {
 
       // Handle the token (e.g., send it to your server for payment processing)
 
-      const orderDescription = cart.items
-        ? cart.items
+      const orderDescription = cart
+        ? cart
             .map(
               (item, index) =>
-                `(${item.cantidad}x) ${
-                  item.producto.nombreProducto
-                } - $${item.producto.precio.toFixed(2)}`
+                `(${item.quantity}x) ${
+                  item.nombreProducto
+                } - $${item.precio.toFixed(2)}`
             )
             .join("\n")
         : "";
@@ -49,12 +57,9 @@ const CheckOut = () => {
 
         description: orderDescription,
         amount:
-          cart.items &&
-          cart.items
-            .reduce(
-              (total, item) => total + item.cantidad * item.producto.precio,
-              0
-            )
+          cart &&
+          cart
+            .reduce((total, item) => total + item.quantity * item.precio, 0)
             .toFixed(2) * 100, // Set the amount in cents (e.g., 1000 for $10.00)
         currency: "usd",
       });
@@ -83,31 +88,20 @@ const CheckOut = () => {
         paymentIntentId: result.paymentIntent.id,
         carritoId: cart.carritoId,
       });
+      onClearBasket()
       toast.success("Pago Realizado", {
         onClose: () => {
           // Después de cerrar el toast, redirigir
           navigate("/");
         },
       });
+     
     } catch (error) {
       // Handle errors during token creation or API requests
       console.error(error);
     }
   };
 
-  const [client, setClient] = useState({});
-  useEffect(() => {
-    // Hacer una solicitud GET a la API para obtener el nombre
-    api
-      .get("/v1/auth/user")
-      .then((response) => {
-        // Establecer el nombre en el estado usando los datos de la respuesta
-        setClient(response.data);
-      })
-      .catch((error) => {
-        console.error("Error al obtener productos:", error);
-      });
-  }, [localStorage.getItem("token")]);
   return (
     <div>
       <div id="breadcrumb" className="section">
@@ -227,13 +221,13 @@ const CheckOut = () => {
               </div>
               <div className="order-summary">
                 {/* Detalles del pedido */}
-                {cart.items &&
-                  cart.items.map((item, index) => (
+                {cart &&
+                  cart.map((item, index) => (
                     <div className="order-col" key={index}>
                       <div>
-                        {item.cantidad}x {item.producto.nombreProducto}
+                        {item.quantity}x {item.nombreProducto}
                       </div>
-                      <div>${item.producto.precio.toFixed(2)}</div>
+                      <div>${item.precio.toFixed(2)}</div>
                     </div>
                   ))}
 
@@ -251,11 +245,11 @@ const CheckOut = () => {
                   <div>
                     <strong className="order-total">
                       $
-                      {cart.items &&
-                        cart.items
+                      {cart &&
+                        cart
                           .reduce(
                             (total, item) =>
-                              total + item.cantidad * item.producto.precio,
+                              total + item.quantity * item.precio,
                             0
                           )
                           .toFixed(2)}
@@ -276,7 +270,6 @@ const CheckOut = () => {
               {/* /Métodos de pago */}
               <CardElement
                 id="my-card"
-                onChange={handleCardChange}
                 options={{
                   iconStyle: "solid",
                   style: {

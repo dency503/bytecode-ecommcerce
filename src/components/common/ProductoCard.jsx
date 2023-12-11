@@ -1,12 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
-
+import ImagenLoader from "./ImagenLoader"
 const ProductoCard = ({ producto, index }) => {
   return (
     <div className="product" key={index}>
       <Link to={`/products/${producto.productoId}`}>
         <div className="product-img">
-          <img src={producto.imagenURl} alt={producto.nombreProducto} />
+          <ImagenLoader src={producto.imagenURl} alt={producto.nombreProducto} />
           <div className="product-label">
             {producto.etiquetas && (
               <span key={index} className="sale">
